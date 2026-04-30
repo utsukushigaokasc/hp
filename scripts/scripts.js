@@ -116,14 +116,45 @@ function tagSectionAnchors(main) {
  * Tag headings + lead paragraphs in main with data-reveal so the global
  * IntersectionObserver can fade them in. Block-level reveals (roster cards,
  * fixture rows, etc.) are tagged inside their own block decorators.
+ *
+ * Children inside a section are also given a --i (index) custom property
+ * so the global reveal CSS can stagger their entry. h2 leads (i=0), then
+ * the lead paragraph, then any subsequent paragraphs / lists / CTAs.
  */
 function autoTagReveals(main) {
-  main.querySelectorAll('.section > div > h1, .section > div > h2, .section > div > h3').forEach((el) => {
-    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+  main.querySelectorAll('.section > div').forEach((wrap) => {
+    const candidates = [...wrap.children].filter((el) => /^(H1|H2|H3|P|UL|OL)$/.test(el.tagName));
+    let i = 0;
+    candidates.forEach((el) => {
+      if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+      el.style.setProperty('--i', i);
+      // cap stagger at 4 so the last item is never more than 480ms behind
+      if (i < 4) i += 1;
+    });
   });
-  main.querySelectorAll('.section > div > p').forEach((el) => {
-    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
-  });
+}
+
+/**
+ * A second, lighter IntersectionObserver that simply tags top-level
+ * sections with `is-in-view` once they cross the threshold. The CSS uses
+ * this to drive the diagonal-slash decoration sweep on each section.
+ */
+function initSectionInViewObserver(main) {
+  if (REDUCED_MOTION.matches || !('IntersectionObserver' in window)) {
+    main.querySelectorAll('.section[id]').forEach((s) => s.classList.add('is-in-view'));
+    return;
+  }
+  const sections = main.querySelectorAll('.section[id]');
+  if (!sections.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  sections.forEach((s) => io.observe(s));
 }
 
 /**
@@ -237,6 +268,7 @@ async function loadLazy(doc) {
 
   // wire scroll-driven effects after blocks are mounted
   initRevealObserver(doc);
+  initSectionInViewObserver(main);
   initScrollProperty();
 
   sampleRUM('lazy');

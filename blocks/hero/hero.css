@@ -59,14 +59,18 @@ main .hero .hero-content {
 }
 
 main .hero .hero-title {
-  font-size: clamp(3.25rem, 10vw, 8rem);
-  font-weight: 800;
-  line-height: 1.02;
+  font-size: clamp(3.5rem, 12vw, 10rem);
+  font-weight: 900;
+  line-height: 0.98;
   margin: 0;
   color: #fff;
-  letter-spacing: -0.025em;
-  text-shadow: 0 2px 30px rgb(9 23 69 / 35%);
+  letter-spacing: -0.035em;
+  text-shadow: 0 2px 30px rgb(9 23 69 / 45%);
   font-feature-settings: "palt" 1;
+}
+
+main .hero .hero-title::first-letter {
+  color: var(--brand-accent);
 }
 
 main .hero .hero-subtitle {

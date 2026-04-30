@@ -3,6 +3,7 @@ main > .section.stats-container {
   background-color: var(--brand-primary);
   color: #fff;
   padding-block: 0;
+  overflow: hidden;
 }
 
 main > .section.stats-container > div {
@@ -19,7 +20,7 @@ main .stats {
   padding-block: clamp(4rem, 10vh, 8rem);
 }
 
-/* faint pitch-line watermark */
+/* dual-layer backdrop: pitch-line watermark + slow-rotating yellow halo */
 main .stats::before {
   content: '';
   position: absolute;
@@ -27,8 +28,37 @@ main .stats::before {
   background:
     linear-gradient(90deg, transparent 49.5%, #fff 49.5%, #fff 50.5%, transparent 50.5%),
     linear-gradient(0deg, transparent 49.5%, #fff 49.5%, #fff 50.5%, transparent 50.5%);
-  opacity: 0.04;
+  opacity: 0.05;
   pointer-events: none;
+}
+
+main .stats::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(40% 40% at 20% 30%, rgb(246 200 69 / 14%) 0%, transparent 60%),
+    radial-gradient(45% 45% at 85% 75%, rgb(255 216 107 / 10%) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main .stats::after {
+    animation: stats-pulse 14s ease-in-out infinite;
+  }
+}
+
+@keyframes stats-pulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.1) rotate(8deg);
+    opacity: 1;
+  }
 }
 
 main .stats .stats-grid {
@@ -40,33 +70,53 @@ main .stats .stats-grid {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.5rem;
+  gap: 3rem 2rem;
 }
 
 main .stats .stats-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.75rem;
-  padding: 0;
+  gap: 0.85rem;
+  padding: 1rem 0;
+}
+
+/* yellow accent-flash on each tile */
+main .stats .stats-tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 36px;
+  height: 4px;
+  background: var(--brand-accent);
+  border-radius: 2px;
+  transform: translateX(-50%) scaleX(0);
+  transition: transform 700ms var(--ease-energy, cubic-bezier(0.16, 1, 0.3, 1)) calc(var(--i, 0) * 120ms + 200ms);
+}
+
+main .stats.is-in .stats-tile::before {
+  transform: translateX(-50%) scaleX(1);
 }
 
 main .stats .stats-num {
-  font-size: clamp(4rem, 12vw, 10rem);
-  font-weight: 800;
-  line-height: 0.95;
+  font-size: clamp(4.5rem, 14vw, 12rem);
+  font-weight: 900;
+  line-height: 0.92;
   color: var(--brand-accent);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.045em;
+  text-shadow: 0 4px 30px rgb(246 200 69 / 18%);
 }
 
 main .stats .stats-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 70%);
+  color: rgb(255 255 255 / 78%);
   opacity: 1;
 }
 

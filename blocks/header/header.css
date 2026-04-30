@@ -46,7 +46,8 @@ header nav .nav-sections a {
   position: relative;
   display: inline-block;
   padding: 0.5rem 0;
-  font-weight: 500;
+  font-weight: 600;
+  transition: transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1), color 150ms ease;
 }
 
 header nav .nav-sections a::after {
@@ -59,7 +60,13 @@ header nav .nav-sections a::after {
   background-color: var(--brand-accent);
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 0.18s ease;
+  transition: transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+header nav .nav-sections a:hover,
+header nav .nav-sections a:focus {
+  transform: translateY(-1px);
+  color: var(--brand-accent);
 }
 
 header nav .nav-sections a:hover::after,

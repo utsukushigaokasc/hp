@@ -89,17 +89,44 @@ footer ol li {
 
 /* oversized stadium-sign wordmark */
 footer .footer-wordmark {
-  font-size: clamp(3rem, 12vw, 12rem);
+  position: relative;
+  font-size: clamp(3.5rem, 14vw, 14rem);
   font-weight: 900;
   line-height: 0.9;
-  letter-spacing: -0.04em;
-  color: rgb(255 255 255 / 6%);
+  letter-spacing: -0.045em;
+  color: rgb(255 255 255 / 7%);
   text-align: center;
   margin: 1rem 0 -0.15em;
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
   overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 7%) 0%,
+    rgb(246 200 69 / 14%) 50%,
+    rgb(255 255 255 / 7%) 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  footer .footer-wordmark {
+    animation: footer-wordmark-shine 9s ease-in-out infinite;
+  }
+}
+
+@keyframes footer-wordmark-shine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @media (width >= 768px) {

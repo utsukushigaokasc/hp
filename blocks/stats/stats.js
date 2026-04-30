@@ -52,6 +52,7 @@ export default async function decorate(block) {
   const list = document.createElement('ul');
   list.className = 'stats-grid';
 
+  let tileIndex = 0;
   [...block.children].forEach((row) => {
     const cells = [...row.children];
     if (!cells.length) return;
@@ -61,6 +62,8 @@ export default async function decorate(block) {
 
     const tile = document.createElement('li');
     tile.className = 'stats-tile';
+    tile.style.setProperty('--i', tileIndex);
+    tileIndex += 1;
 
     const numEl = document.createElement('span');
     numEl.className = 'stats-num';
