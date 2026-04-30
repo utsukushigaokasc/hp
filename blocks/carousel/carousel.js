@@ -142,10 +142,35 @@ function createSlide(row, slideIndex, carouselId) {
   slide.setAttribute('id', `carousel-${carouselId}-slide-${slideIndex}`);
   slide.classList.add('carousel-slide');
 
-  row.querySelectorAll(':scope > div').forEach((column, colIdx) => {
-    column.classList.add(`carousel-slide-${colIdx === 0 ? 'image' : 'content'}`);
-    slide.append(column);
+  const imageDiv = document.createElement('div');
+  imageDiv.classList.add('carousel-slide-image');
+  const contentDiv = document.createElement('div');
+  contentDiv.classList.add('carousel-slide-content');
+
+  // Pull every <picture> out of the row regardless of which cell the author
+  // placed it in. The first one becomes the slide background; any extras
+  // are dropped (they would only fight with the background image).
+  const pictures = [...row.querySelectorAll('picture')];
+  if (pictures.length) {
+    imageDiv.append(pictures[0]);
+    pictures.slice(1).forEach((p) => p.remove());
+  }
+
+  // Move every remaining child out of the row's columns into content,
+  // skipping empty cells. Then drop empty wrapper paragraphs that only
+  // contained the picture we just hoisted.
+  row.querySelectorAll(':scope > div').forEach((col) => {
+    while (col.firstChild) contentDiv.append(col.firstChild);
   });
+  contentDiv.querySelectorAll('p').forEach((p) => {
+    p.normalize();
+    if (!p.textContent.trim() && !p.querySelector('a, picture, img, strong, em')) {
+      p.remove();
+    }
+  });
+
+  slide.append(imageDiv);
+  slide.append(contentDiv);
 
   const labeledBy = slide.querySelector('h1, h2, h3, h4, h5, h6');
   if (labeledBy) {
