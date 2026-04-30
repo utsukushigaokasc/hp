@@ -14,6 +14,9 @@ import {
 
 const LCP_BLOCKS = [];
 
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+const COARSE_POINTER = window.matchMedia('(pointer: coarse)');
+
 /**
  * load fonts.css and set a session storage flag
  */
@@ -27,6 +30,73 @@ async function loadFonts() {
 }
 
 /**
+ * Tag headings + lead paragraphs in main with data-reveal so the global
+ * IntersectionObserver can fade them in. Block-level reveals (roster cards,
+ * fixture rows, etc.) are tagged inside their own block decorators.
+ */
+function autoTagReveals(main) {
+  main.querySelectorAll('.section > div > h1, .section > div > h2, .section > div > h3').forEach((el) => {
+    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+  });
+  main.querySelectorAll('.section > div > p').forEach((el) => {
+    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', '');
+  });
+}
+
+/**
+ * Single page-wide IntersectionObserver. Adds .is-in to anything tagged
+ * [data-reveal] once it crosses the threshold, then unobserves it.
+ * Reduced-motion users get the final state immediately.
+ */
+function initRevealObserver(root = document) {
+  const targets = root.querySelectorAll('[data-reveal]');
+  if (!targets.length) return;
+
+  if (REDUCED_MOTION.matches || !('IntersectionObserver' in window)) {
+    targets.forEach((el) => el.classList.add('is-in'));
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -5% 0px' });
+
+  targets.forEach((el) => io.observe(el));
+}
+
+/**
+ * Single rAF-throttled passive scroll listener writing window.scrollY to
+ * the --scroll custom property on :root. Used by hero parallax and any
+ * future scroll-driven CSS. Early-returns on coarse pointers and
+ * reduced-motion environments.
+ */
+function initScrollProperty() {
+  if (REDUCED_MOTION.matches || COARSE_POINTER.matches) return;
+
+  const root = document.documentElement;
+  let ticking = false;
+
+  const update = () => {
+    root.style.setProperty('--scroll', window.scrollY);
+    ticking = false;
+  };
+
+  // prime the value
+  update();
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
+  }, { passive: true });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -36,6 +106,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   decorateSections(main);
   decorateBlocks(main);
+  autoTagReveals(main);
 }
 
 /**
@@ -78,6 +149,10 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  // wire scroll-driven effects after blocks are mounted
+  initRevealObserver(doc);
+  initScrollProperty();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));

@@ -1,15 +1,26 @@
 footer.footer-wrapper {
   background-color: var(--brand-primary-dark);
   color: #fff;
+  overflow: hidden;
 }
 
 footer .footer {
+  position: relative;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2.5rem var(--content-padding-x);
+  padding: 6rem var(--gutter) 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2.5rem;
+}
+
+footer .footer-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: rgb(255 255 255 / 80%);
 }
 
 footer .footer-fallback {
@@ -20,15 +31,18 @@ footer .footer-fallback {
 
 footer p {
   margin: 0;
+  max-width: none;
 }
 
 footer a:any-link {
-  color: var(--brand-accent);
+  color: rgb(255 255 255 / 85%);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 footer a:hover {
-  text-decoration: underline;
+  color: var(--brand-accent);
+  text-decoration: none;
 }
 
 footer h1,
@@ -37,10 +51,12 @@ footer h3,
 footer h4,
 footer h5,
 footer h6 {
-  margin: 0 0 0.5rem;
-  font-size: var(--body-font-size-m);
-  font-weight: 600;
-  color: #fff;
+  margin: 0 0 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
 }
 
 footer ul,
@@ -52,15 +68,27 @@ footer ol {
 
 footer ul li,
 footer ol li {
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+/* oversized stadium-sign wordmark */
+footer .footer-wordmark {
+  font-size: clamp(3rem, 12vw, 12rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: rgb(255 255 255 / 6%);
+  text-align: center;
+  margin: 1rem 0 -0.15em;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 @media (width >= 768px) {
-  footer .footer {
-    flex-flow: row wrap;
+  footer .footer-inner {
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 3rem var(--content-padding-x);
   }
 }

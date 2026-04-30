@@ -1,19 +1,21 @@
 main .hero {
   position: relative;
-  min-height: 70vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   color: #fff;
   text-align: center;
-  padding: 4rem 1.5rem;
+  padding: 6rem var(--gutter);
+  background: linear-gradient(180deg, var(--brand-primary) 0%, var(--brand-primary-dark) 100%);
 }
 
 main .hero .hero-media {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
 }
 
 main .hero .hero-media picture,
@@ -22,6 +24,14 @@ main .hero .hero-media img {
   height: 100%;
   display: block;
   object-fit: cover;
+  transform: translate3d(0, -5%, 0) scale(1.1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) and (pointer: fine) {
+  main .hero .hero-media img {
+    transform: translate3d(0, calc((var(--scroll) * -0.3px) - 5%), 0) scale(1.1);
+  }
 }
 
 main .hero::after {
@@ -32,8 +42,9 @@ main .hero::after {
   background: linear-gradient(
     180deg,
     rgb(11 29 89 / 55%) 0%,
-    rgb(9 23 69 / 80%) 100%
+    rgb(9 23 69 / 92%) 100%
   );
+  pointer-events: none;
 }
 
 main .hero .hero-content {
@@ -43,24 +54,82 @@ main .hero .hero-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 main .hero .hero-title {
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.1;
+  font-size: clamp(3rem, 9vw, 7.5rem);
+  font-weight: 800;
+  line-height: 1.02;
   margin: 0;
   color: #fff;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
 }
 
 main .hero .hero-subtitle {
   font-size: clamp(1rem, 1.6vw, 1.25rem);
   margin: 0;
-  color: rgb(255 255 255 / 85%);
+  color: rgb(255 255 255 / 90%);
   font-weight: 400;
+  max-width: 40rem;
 }
 
 main .hero .hero-cta {
-  margin: 1rem 0 0;
+  margin: 1.5rem 0 0;
+}
+
+/* scroll cue */
+main .hero .hero-cue {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  width: 1px;
+  height: 3rem;
+  background: linear-gradient(180deg, transparent 0%, rgb(255 255 255 / 80%) 100%);
+  transform: translateX(-50%);
+  z-index: 2;
+  opacity: 0.85;
+  transition: opacity 600ms ease;
+}
+
+main .hero.is-scrolled .hero-cue {
+  opacity: 0;
+}
+
+/* hero content stagger reveal — overrides the global [data-reveal] timing
+   so each child eases in with a 200ms cascade */
+@media (prefers-reduced-motion: no-preference) {
+  main .hero [data-reveal] {
+    transition-delay: calc(var(--i, 0) * 200ms);
+  }
+}
+
+/* scroll-out fade/scale via animation-timeline (Chromium 115+).
+   Fallback browsers keep the static rest state. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main .hero .hero-content {
+      animation: hero-exit linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 80%;
+    }
+
+    main .hero::after {
+      animation: hero-overlay-deepen linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+@keyframes hero-exit {
+  to {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes hero-overlay-deepen {
+  from { background: linear-gradient(180deg, rgb(11 29 89 / 55%) 0%, rgb(9 23 69 / 80%) 100%); }
+  to { background: linear-gradient(180deg, rgb(9 23 69 / 92%) 0%, rgb(9 23 69 / 98%) 100%); }
 }

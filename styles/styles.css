@@ -1,8 +1,9 @@
 :root {
   /* brand */
-  --brand-primary: #0B1D59;
+  --brand-primary: #0b1d59;
   --brand-primary-dark: #091745;
-  --brand-accent: #F6C845;
+  --brand-accent: #f6c845;
+  --brand-accent-bright: #ffd86b;
 
   /* surfaces */
   --bg-color: #fff;
@@ -19,22 +20,29 @@
   --max-width: 1200px;
   --header-height: 72px;
   --content-padding-x: 1.25rem;
+  --section-pad-y: clamp(6rem, 12vh, 10rem);
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --prose-width: 66ch;
 
   /* fonts */
-  --body-font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  --body-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   --heading-font-family: var(--body-font-family);
-  --fixed-font-family: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+  --fixed-font-family: ui-monospace, sfmono-regular, menlo, consolas, monospace;
 
   /* font sizes */
   --body-font-size-l: 1.125rem;
   --body-font-size-m: 1rem;
   --body-font-size-s: 0.9375rem;
   --body-font-size-xs: 0.8125rem;
-  --heading-font-size-xxl: 3rem;
-  --heading-font-size-xl: 2.25rem;
+  --heading-display: clamp(3rem, 10vw, 8rem);
+  --heading-font-size-xxl: clamp(2.5rem, 6vw, 5rem);
+  --heading-font-size-xl: clamp(2rem, 4vw, 3rem);
   --heading-font-size-l: 1.75rem;
   --heading-font-size-m: 1.375rem;
   --heading-font-size-s: 1.125rem;
+
+  /* parallax — initialized by scripts.js */
+  --scroll: 0;
 }
 
 html {
@@ -51,7 +59,7 @@ body {
   margin: 0;
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--text-color);
   background-color: var(--bg-color);
   display: none;
@@ -79,12 +87,18 @@ main {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading-font-family);
   font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 0.75em;
+  line-height: 1.15;
+  margin: 0 0 0.6em;
   color: var(--text-color);
+  letter-spacing: -0.01em;
 }
 
-h1 { font-size: var(--heading-font-size-xxl); }
+h1 {
+  font-size: var(--heading-font-size-xxl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 h2 { font-size: var(--heading-font-size-xl); }
 h3 { font-size: var(--heading-font-size-l); }
 h4 { font-size: var(--heading-font-size-m); }
@@ -93,6 +107,10 @@ h6 { font-size: var(--body-font-size-m); }
 
 p, ul, ol, dl, blockquote, pre {
   margin: 0 0 1em;
+}
+
+main p {
+  max-width: var(--prose-width);
 }
 
 a:any-link {
@@ -132,7 +150,9 @@ hr {
 /* sections — vertical stacking */
 main > .section {
   width: 100%;
-  padding: 3rem 0;
+  padding-block: var(--section-pad-y);
+  background-color: var(--bg-color);
+  transition: background-color 400ms ease;
 }
 
 main > .section:empty {
@@ -142,10 +162,14 @@ main > .section:empty {
 main > .section > div {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 var(--content-padding-x);
+  padding: 0 var(--gutter);
 }
 
 /* full-bleed escape hatch (opt-in via .full-bleed on the section) */
+main > .section.full-bleed {
+  padding-block: 0;
+}
+
 main > .section.full-bleed > div {
   max-width: none;
   padding: 0;
@@ -156,7 +180,7 @@ main > .section.dark {
   background-color: var(--brand-primary);
   color: #fff;
 
-  --text-muted: rgb(255 255 255 / 80%);
+  --text-muted: rgb(255 255 255 / 75%);
 }
 
 main > .section.dark h1,
@@ -177,13 +201,27 @@ main > .section.dark a:hover {
 }
 
 /* alternating subtle background */
-main > .section.muted {
+main > .section.muted,
+main > .section.highlight {
   background-color: var(--bg-alt);
 }
 
-/* highlight (legacy section style) */
-main > .section.highlight {
-  background-color: var(--bg-alt);
+/* prose / breath section — single centered column */
+main > .section.breath > div {
+  max-width: 38rem;
+  text-align: center;
+}
+
+main > .section.breath h2 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+main > .section.breath p {
+  font-size: 1.125rem;
+  line-height: 1.85;
+  margin-inline: auto;
 }
 
 /* buttons */
@@ -202,7 +240,7 @@ button {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 a.button:hover,
@@ -223,8 +261,8 @@ a.button.primary {
 
 a.button.primary:hover,
 a.button.primary:focus {
-  background-color: #ffd86b;
-  border-color: #ffd86b;
+  background-color: var(--brand-accent-bright);
+  border-color: var(--brand-accent-bright);
   color: var(--brand-primary);
 }
 
@@ -282,18 +320,32 @@ button:disabled:hover {
   width: 100%;
 }
 
-@media (width >= 768px) {
-  :root {
-    --content-padding-x: 2rem;
+/* ──────────────────────────────────────────────────────────────
+   Reveal animation — global, driven by scripts.js IntersectionObserver
+   ────────────────────────────────────────────────────────────── */
+
+[data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
+                transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: opacity, transform;
   }
 
-  main > .section {
-    padding: 4rem 0;
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
   }
 }
 
-@media (width >= 1024px) {
-  main > .section {
-    padding: 5rem 0;
+@media (width >= 768px) {
+  :root {
+    --content-padding-x: 2rem;
   }
 }

@@ -1,7 +1,15 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-const FALLBACK_TEXT = '© 2026 Tokyo United FC';
+const FALLBACK_TEXT = '(c) 2026 Tokyo United FC';
+
+function buildWordmark() {
+  const mark = document.createElement('div');
+  mark.className = 'footer-wordmark';
+  mark.setAttribute('aria-hidden', 'true');
+  mark.textContent = 'TOKYO UNITED FC';
+  return mark;
+}
 
 function renderFallback(block) {
   block.textContent = '';
@@ -9,6 +17,7 @@ function renderFallback(block) {
   wrapper.className = 'footer-fallback';
   wrapper.textContent = FALLBACK_TEXT;
   block.append(wrapper);
+  block.append(buildWordmark());
 }
 
 /**
@@ -34,7 +43,9 @@ export default async function decorate(block) {
     return;
   }
 
-  const footer = document.createElement('div');
-  while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
-  block.append(footer);
+  const inner = document.createElement('div');
+  inner.className = 'footer-inner';
+  while (fragment.firstElementChild) inner.append(fragment.firstElementChild);
+  block.append(inner);
+  block.append(buildWordmark());
 }

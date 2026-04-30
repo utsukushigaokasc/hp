@@ -38,6 +38,27 @@ export default async function decorate(block) {
     media.append(picture);
     block.append(media);
   }
+
+  // scroll cue — fades after first scroll
+  const cue = document.createElement('span');
+  cue.className = 'hero-cue';
+  cue.setAttribute('aria-hidden', 'true');
+
   block.append(content);
+  block.append(cue);
+
   block.querySelector('a.button')?.classList.add('primary');
+
+  // dismiss the cue after the first user-initiated scroll
+  const dismissCue = () => {
+    block.classList.add('is-scrolled');
+    window.removeEventListener('scroll', dismissCue);
+  };
+  window.addEventListener('scroll', dismissCue, { passive: true, once: true });
+
+  // reveal stagger — title, subtitle, CTA
+  [...content.children].forEach((el, i) => {
+    el.setAttribute('data-reveal', '');
+    el.style.setProperty('--i', i);
+  });
 }

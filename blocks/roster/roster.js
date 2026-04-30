@@ -1,3 +1,5 @@
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 export default async function decorate(block) {
   const list = document.createElement('ul');
   list.className = 'roster-grid';
@@ -17,11 +19,13 @@ export default async function decorate(block) {
     const media = document.createElement('div');
     media.className = 'roster-media';
     if (photo) media.append(photo);
+
     if (number) {
       const badge = document.createElement('span');
       badge.className = 'roster-number';
+      badge.setAttribute('aria-hidden', 'true');
       badge.textContent = number;
-      media.append(badge);
+      card.append(badge);
     }
 
     const body = document.createElement('div');
@@ -40,4 +44,25 @@ export default async function decorate(block) {
 
   block.textContent = '';
   block.append(list);
+
+  // stagger index for CSS transition-delay
+  const cards = [...list.children];
+  cards.forEach((el, i) => el.style.setProperty('--i', i));
+
+  // IO fallback for browsers without view-timeline
+  if (REDUCED_MOTION.matches || !('IntersectionObserver' in window)) {
+    cards.forEach((el) => el.classList.add('is-in'));
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+  cards.forEach((el) => io.observe(el));
 }
