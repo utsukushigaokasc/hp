@@ -29,6 +29,34 @@ async function loadFonts() {
   }
 }
 
+const SECTION_ANCHOR_MAP = [
+  ['美しが丘SCについて', 'about'],
+  ['About', 'about'],
+  ['体験会', 'trial'],
+  ['体験・入会', 'trial'],
+  ['活動グラウンド', 'grounds'],
+  ['練習スケジュール', 'schedule'],
+  ['スケジュール', 'schedule'],
+  ['お知らせ', 'news'],
+  ['ニュース', 'news'],
+  ['よくある質問', 'faq'],
+  ['FAQ', 'faq'],
+];
+
+function tagSectionAnchors(main) {
+  main.querySelectorAll('.section').forEach((section) => {
+    if (section.id) return;
+    const h2 = section.querySelector('h2');
+    if (!h2) return;
+    const text = h2.textContent.trim();
+    const match = SECTION_ANCHOR_MAP.find(([prefix]) => text.startsWith(prefix));
+    if (match) {
+      const [, slug] = match;
+      section.id = slug;
+    }
+  });
+}
+
 /**
  * Tag headings + lead paragraphs in main with data-reveal so the global
  * IntersectionObserver can fade them in. Block-level reveals (roster cards,
@@ -106,6 +134,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   decorateSections(main);
   decorateBlocks(main);
+  tagSectionAnchors(main);
   autoTagReveals(main);
 }
 

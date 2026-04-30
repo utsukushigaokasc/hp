@@ -1,8 +1,8 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 
-const isDesktop = window.matchMedia('(min-width: 900px)');
+const isDesktop = window.matchMedia('(min-width: 1024px)');
 
-const BRAND_FALLBACK = 'Tokyo United FC';
+const BRAND_FALLBACK = '美しが丘SC';
 
 function renderBrandOnly(block) {
   const nav = document.createElement('nav');

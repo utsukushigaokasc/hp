@@ -69,11 +69,13 @@ header nav .nav-sections a:focus::after {
 
 /* brand */
 header nav .nav-brand {
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 header nav .nav-brand a:any-link {
@@ -148,29 +150,37 @@ header nav[aria-expanded="true"] .nav-hamburger-icon::after {
 }
 
 /* desktop */
-@media (width >= 900px) {
+@media (width >= 1024px) {
   header nav .nav-sections {
     flex: 1 1 auto;
-    margin-left: 2.5rem;
+    margin-left: clamp(1.25rem, 3vw, 2.5rem);
+    min-width: 0;
   }
 
   header nav .nav-sections ul {
     display: flex;
-    gap: 2rem;
+    flex-wrap: nowrap;
+    gap: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  header nav .nav-sections a {
+    white-space: nowrap;
   }
 
   header nav .nav-tools {
-    margin-left: 1.5rem;
+    margin-left: clamp(0.75rem, 2vw, 1.5rem);
+    flex: 0 0 auto;
   }
 
   header nav .nav-tools ul {
     display: flex;
     gap: 1rem;
+    white-space: nowrap;
   }
 }
 
 /* mobile */
-@media (width < 900px) {
+@media (width < 1024px) {
   header nav .nav-hamburger {
     display: block;
   }

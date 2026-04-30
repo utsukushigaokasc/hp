@@ -1,13 +1,13 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-const FALLBACK_TEXT = '(c) 2026 Tokyo United FC';
+const FALLBACK_TEXT = '© 2026 美しが丘SC';
 
 function buildWordmark() {
   const mark = document.createElement('div');
   mark.className = 'footer-wordmark';
   mark.setAttribute('aria-hidden', 'true');
-  mark.textContent = 'TOKYO UNITED FC';
+  mark.textContent = '美しが丘SC';
   return mark;
 }
 

@@ -1,7 +1,7 @@
 main .roster .roster-grid {
   list-style: none;
   margin: 0;
-  padding: 2rem 0 0;
+  padding: 2.5rem 0 0;
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem 1.5rem;
