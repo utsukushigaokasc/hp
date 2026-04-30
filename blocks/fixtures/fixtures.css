@@ -1,0 +1,55 @@
+main .fixtures {
+  padding: 3rem 0;
+  overflow-x: auto;
+}
+
+main .fixtures .fixtures-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: var(--bg-color, #fff);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+}
+
+main .fixtures .fixtures-table thead {
+  background: var(--brand-primary, #0b1d59);
+}
+
+main .fixtures .fixtures-table th {
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+main .fixtures .fixtures-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--bg-alt, #eef0f5);
+  color: var(--text-color, #111);
+  vertical-align: middle;
+}
+
+main .fixtures .fixtures-table tbody tr:nth-child(even) {
+  background: var(--bg-alt, #f7f8fb);
+}
+
+main .fixtures .fixtures-table tbody tr:hover {
+  background: rgb(246 200 69 / 12%);
+}
+
+main .fixtures .fixtures-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+main .fixtures .fixtures-score {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, sfmono-regular, menlo, monospace;
+  white-space: nowrap;
+  color: var(--brand-primary, #0b1d59);
+}
