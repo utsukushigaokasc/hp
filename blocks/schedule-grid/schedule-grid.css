@@ -99,6 +99,10 @@
   }
 }
 
+.schedule-grid [hidden] {
+  display: none !important;
+}
+
 .schedule-grid .sg-event {
   display: grid;
   grid-template-columns: 64px 1fr;

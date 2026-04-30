@@ -115,7 +115,8 @@ function applyFilter(block, slug) {
     t.classList.toggle('is-active', active);
   });
   block.querySelectorAll('.sg-event').forEach((el) => {
-    const match = slug === 'all' || el.dataset.category === slug;
+    const cat = el.dataset.category;
+    const match = slug === 'all' || cat === slug || cat === 'all';
     el.hidden = !match;
   });
   block.querySelectorAll('.sg-month').forEach((m) => {
