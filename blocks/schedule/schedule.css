@@ -1,5 +1,5 @@
 main .schedule {
-  margin: 1.5rem 0 2rem;
+  margin: 2rem 0 2.5rem;
 }
 
 main .schedule .schedule-table {
@@ -8,6 +8,16 @@ main .schedule .schedule-table {
   border-collapse: collapse;
   font-size: var(--body-font-size-m);
   line-height: 1.55;
+}
+
+@media (width >= 640px) {
+  main .schedule .schedule-table tbody tr:nth-child(even) td {
+    background-color: var(--bg-color);
+  }
+
+  main > .section[id]:nth-of-type(even) .schedule .schedule-table tbody tr:nth-child(even) td {
+    background-color: #fff;
+  }
 }
 
 main .schedule .schedule-table thead {

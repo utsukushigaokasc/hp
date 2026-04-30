@@ -67,19 +67,36 @@ header nav .nav-sections a:focus::after {
   transform: scaleX(1);
 }
 
-/* brand */
+/* brand — explicitly reset all heading-derived properties so a stray
+   <h1>/<h2>/<p><strong> coming through nav.plain.html cannot be
+   restyled by global heading rules. */
+header nav .nav-brand,
+header nav .nav-brand * {
+  margin: 0;
+  padding: 0;
+  font-family: var(--body-font-family);
+  font-style: normal;
+  text-transform: none;
+}
+
 header nav .nav-brand {
-  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1;
   color: #fff;
   white-space: nowrap;
   flex: 0 0 auto;
 }
 
-header nav .nav-brand a:any-link {
+header nav .nav-brand a:any-link,
+header nav .nav-brand strong {
   color: #fff;
+  font-weight: 700;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-decoration: none;
 }
 
 header nav .nav-brand img {

@@ -4,20 +4,62 @@ const isDesktop = window.matchMedia('(min-width: 1024px)');
 
 const BRAND_FALLBACK = '美しが丘SC';
 
+function makeBrandEl(text) {
+  const brand = document.createElement('div');
+  brand.className = 'nav-brand';
+  const link = document.createElement('a');
+  link.href = '/';
+  link.setAttribute('aria-label', `${text} home`);
+  link.textContent = text;
+  brand.append(link);
+  return brand;
+}
+
 function renderBrandOnly(block) {
   const nav = document.createElement('nav');
   nav.id = 'nav';
   nav.setAttribute('aria-expanded', 'false');
 
-  const brand = document.createElement('div');
-  brand.className = 'nav-brand';
-  brand.textContent = BRAND_FALLBACK;
-  nav.append(brand);
+  nav.append(makeBrandEl(BRAND_FALLBACK));
 
   const wrapper = document.createElement('div');
   wrapper.className = 'nav-wrapper';
   wrapper.append(nav);
   block.append(wrapper);
+}
+
+/**
+ * Extract a brand element from a section's first child if it looks like a
+ * standalone brand (a heading or a paragraph with a single <strong> token
+ * and no other prose). Returns the brand text or null.
+ */
+function extractBrandText(section) {
+  if (!section) return null;
+  const first = section.firstElementChild;
+  if (!first) return null;
+
+  // h1–h6 directly == brand
+  if (/^H[1-6]$/.test(first.tagName)) {
+    const text = first.textContent.trim();
+    if (text) {
+      first.remove();
+      return text;
+    }
+  }
+
+  // <p><strong>BRAND</strong></p> with no siblings inside the <p>
+  if (first.tagName === 'P') {
+    const strong = first.querySelector('strong');
+    const onlyChild = first.children.length === 1 && first.firstElementChild === strong;
+    const noStrayText = first.textContent.trim() === (strong?.textContent || '').trim();
+    if (strong && onlyChild && noStrayText) {
+      const text = strong.textContent.trim();
+      first.remove();
+      return text;
+    }
+  }
+
+  return null;
 }
 
 function toggleMenu(nav, expanded) {
@@ -63,20 +105,46 @@ export default async function decorate(block) {
   nav.innerHTML = html;
   nav.setAttribute('aria-expanded', 'false');
 
-  const sectionEls = [...nav.children];
+  // If the doc author put the brand and links inside one wrapper section
+  // (single <div> with <p><strong>BRAND</strong></p> + <ul>...), pull the
+  // brand out into its own first section so we never render it twice.
+  let sectionEls = [...nav.children];
+  if (sectionEls.length === 1) {
+    const only = sectionEls[0];
+    const brandText = extractBrandText(only);
+    if (brandText) {
+      const brandSection = makeBrandEl(brandText);
+      nav.prepend(brandSection);
+      sectionEls = [...nav.children];
+    }
+  }
+
   const classes = sectionEls.length === 1
     ? ['sections']
     : ['brand', 'sections', 'tools'];
   classes.forEach((c, i) => {
     const section = sectionEls[i];
-    if (section) section.classList.add(`nav-${c}`);
+    if (!section) return;
+    // skip if we already created a structured brand element above
+    if (c === 'brand' && section.classList.contains('nav-brand')) return;
+    section.classList.add(`nav-${c}`);
   });
 
+  // Defensive: if the brand section is a wrapper that ALSO contains a
+  // heading / strong, normalize it so only plain brand text remains.
+  const brandSection = nav.querySelector('.nav-brand');
+  if (brandSection && !brandSection.querySelector('a')) {
+    const text = brandSection.textContent.trim() || BRAND_FALLBACK;
+    brandSection.replaceChildren();
+    const link = document.createElement('a');
+    link.href = '/';
+    link.setAttribute('aria-label', `${text} home`);
+    link.textContent = text;
+    brandSection.append(link);
+  }
+
   if (!nav.querySelector('.nav-brand')) {
-    const brand = document.createElement('div');
-    brand.className = 'nav-brand';
-    brand.textContent = BRAND_FALLBACK;
-    nav.prepend(brand);
+    nav.prepend(makeBrandEl(BRAND_FALLBACK));
   }
 
   const hamburger = document.createElement('div');

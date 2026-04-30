@@ -43,16 +43,71 @@ const SECTION_ANCHOR_MAP = [
   ['FAQ', 'faq'],
 ];
 
+/**
+ * If the document has all of its content inside a single top-level <div>
+ * (no Section Metadata separators), split it into multiple sibling
+ * <div>s so each h2 lands in its own section. The hero block also gets
+ * its own section. This must run BEFORE decorateSections().
+ */
+function splitImplicitSections(main) {
+  const tops = [...main.children].filter((c) => c.tagName === 'DIV');
+  if (tops.length !== 1) return;
+  const root = tops[0];
+
+  // collect break points: any direct child that's an H2 OR a hero block.
+  const kids = [...root.children];
+  const breaks = [];
+  kids.forEach((el, i) => {
+    const isHero = el.tagName === 'DIV' && el.classList.contains('hero');
+    const isH2 = el.tagName === 'H2';
+    if (isHero || isH2) breaks.push({ i, type: isHero ? 'hero' : 'h2' });
+  });
+
+  if (breaks.length < 2) return;
+
+  // Build groups: [start, end) ranges between break points (and the leading
+  // chunk before the first break, if any).
+  const groups = [];
+  if (breaks[0].i > 0) groups.push({ start: 0, end: breaks[0].i });
+  for (let b = 0; b < breaks.length; b += 1) {
+    const start = breaks[b].i;
+    const end = b + 1 < breaks.length ? breaks[b + 1].i : kids.length;
+    groups.push({ start, end });
+  }
+
+  const newDivs = groups.map(({ start, end }) => {
+    const div = document.createElement('div');
+    for (let k = start; k < end; k += 1) div.append(kids[k]);
+    return div;
+  });
+
+  root.replaceWith(...newDivs);
+}
+
+function slugFor(text) {
+  const match = SECTION_ANCHOR_MAP.find(([prefix]) => text.startsWith(prefix));
+  return match ? match[1] : null;
+}
+
+/**
+ * Tag both the section *and* every h2 inside it with anchor ids derived
+ * from the heading text. Authors often place multiple h2s in a single
+ * section without Section Metadata separators; we still want #trial,
+ * #news, #faq, etc. to scroll to the right heading.
+ */
 function tagSectionAnchors(main) {
   main.querySelectorAll('.section').forEach((section) => {
-    if (section.id) return;
-    const h2 = section.querySelector('h2');
-    if (!h2) return;
-    const text = h2.textContent.trim();
-    const match = SECTION_ANCHOR_MAP.find(([prefix]) => text.startsWith(prefix));
-    if (match) {
-      const [, slug] = match;
-      section.id = slug;
+    const headings = [...section.querySelectorAll('h2')];
+    if (!headings.length) return;
+    headings.forEach((h2) => {
+      const text = h2.textContent.trim();
+      const slug = slugFor(text);
+      if (!slug) return;
+      if (!h2.id) h2.id = slug;
+    });
+    if (!section.id) {
+      const firstSlug = slugFor(headings[0].textContent.trim());
+      if (firstSlug) section.id = firstSlug;
     }
   });
 }
@@ -130,6 +185,7 @@ function initScrollProperty() {
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  splitImplicitSections(main);
   decorateButtons(main);
   decorateIcons(main);
   decorateSections(main);

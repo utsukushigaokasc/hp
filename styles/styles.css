@@ -20,11 +20,12 @@
   --max-width: 1200px;
   --header-height: 72px;
   --content-padding-x: 1.25rem;
-  --section-pad-y: clamp(3.5rem, 7vh, 6rem);
+  --section-pad-y: clamp(5rem, 11vh, 10rem);
   --gutter: clamp(1.25rem, 4vw, 3rem);
-  --prose-width: 66ch;
-  --content-stack: clamp(1rem, 2.4vw, 1.75rem);
-  --heading-stack: clamp(2.25rem, 5vw, 3.5rem);
+  --prose-width: 36rem;
+  --prose-width-wide: 44rem;
+  --content-stack: clamp(1.5rem, 2.6vw, 2rem);
+  --heading-stack: clamp(3rem, 6vw, 5rem);
 
   /* fonts */
   --body-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
@@ -37,9 +38,9 @@
   --body-font-size-s: 0.9375rem;
   --body-font-size-xs: 0.8125rem;
   --heading-display: clamp(3rem, 10vw, 8rem);
-  --heading-font-size-xxl: clamp(2.5rem, 6vw, 5rem);
-  --heading-font-size-xl: clamp(2rem, 4vw, 3rem);
-  --heading-font-size-l: 1.75rem;
+  --heading-font-size-xxl: clamp(2.75rem, 6vw, 5rem);
+  --heading-font-size-xl: clamp(2rem, 4.5vw, 3.5rem);
+  --heading-font-size-l: clamp(1.5rem, 2.4vw, 1.875rem);
   --heading-font-size-m: 1.375rem;
   --heading-font-size-s: 1.125rem;
 
@@ -61,10 +62,14 @@ body {
   margin: 0;
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
-  line-height: 1.7;
+  line-height: 1.85;
   color: var(--text-color);
   background-color: var(--bg-color);
   display: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizelegibility;
+  font-feature-settings: "palt" 1, "kern" 1;
 }
 
 body.appear {
@@ -86,33 +91,37 @@ main {
   width: 100%;
 }
 
-h1, h2, h3, h4, h5, h6 {
+/* Scope global heading rhythm to <main> so they cannot leak into
+   <header>, <footer>, or any chrome that lives outside main. */
+main h1, main h2, main h3, main h4, main h5, main h6 {
   font-family: var(--heading-font-family);
   font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 0.75em;
+  line-height: 1.15;
+  margin: 0 0 0.6em;
   color: var(--text-color);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  font-feature-settings: "palt" 1;
 }
 
-h1 {
+main h1 {
   font-size: var(--heading-font-size-xxl);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
-h2 { font-size: var(--heading-font-size-xl); }
-h3 { font-size: var(--heading-font-size-l); }
-h4 { font-size: var(--heading-font-size-m); }
-h5 { font-size: var(--heading-font-size-s); }
-h6 { font-size: var(--body-font-size-m); }
+main h2 { font-size: var(--heading-font-size-xl); }
+main h3 { font-size: var(--heading-font-size-l); }
+main h4 { font-size: var(--heading-font-size-m); }
+main h5 { font-size: var(--heading-font-size-s); }
+main h6 { font-size: var(--body-font-size-m); }
 
-p, ul, ol, dl, blockquote, pre {
+main p, main ul, main ol, main dl, main blockquote, main pre {
   margin: 0 0 1.15em;
 }
 
 main p {
   max-width: var(--prose-width);
+  font-feature-settings: "palt" 1;
 }
 
 /* Heading rhythm — h2/h3 need breathing room from preceding content,
@@ -121,11 +130,45 @@ main p {
 main > .section > div > h2,
 main > .section > div > h3 {
   margin-top: var(--heading-stack);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  max-width: 22ch;
+}
+
+main > .section > div > h2 {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  margin-bottom: 1.25rem;
+}
+
+main > .section > div > h3 {
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  margin-bottom: 0.75rem;
 }
 
 main > .section > div > h2:first-child,
 main > .section > div > h3:first-child {
   margin-top: 0;
+}
+
+/* Body paragraphs in sections — premium reading width + rhythm. */
+main > .section > div > p {
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.9;
+  max-width: var(--prose-width);
+  color: var(--text-color);
+}
+
+/* The first paragraph immediately after an h2 reads as a lead. */
+main > .section > div > h2 + p {
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  color: var(--text-color);
+  line-height: 1.85;
+}
+
+main > .section > div p strong {
+  color: var(--text-color);
+  font-weight: 700;
 }
 
 /* Slightly more breathing room between adjacent prose paragraphs,
@@ -135,27 +178,66 @@ main > .section > div > p + p {
   margin-top: var(--content-stack);
 }
 
+/* News + FAQ entries (paragraph-led with a <strong> ledger) — break the
+   <strong> onto its own visual line via display:block and give the body
+   a muted tone, so each entry reads like a clean two-line card without
+   needing custom block markup. */
+/* stylelint-disable no-descending-specificity */
+main > .section > div > p > strong:first-child {
+  display: block;
+  font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+  color: var(--brand-primary);
+}
+
+/* When a paragraph leads with a <strong>, treat the whole para as an
+   "entry" and adjust the body color for hierarchy. */
+main > .section > div > p:has(> strong:first-child) {
+  color: var(--text-muted);
+  max-width: var(--prose-width-wide);
+}
+
+/* Stronger separation between consecutive entries (News, FAQ). */
+main > .section > div > p:has(> strong:first-child) + p:has(> strong:first-child) {
+  margin-top: clamp(2rem, 3.5vw, 2.75rem);
+  padding-top: clamp(2rem, 3.5vw, 2.75rem);
+  border-top: 1px solid var(--border-color);
+}
+/* stylelint-enable no-descending-specificity */
+
 /* Lists in prose — give items breathing room and a clean indent */
 main > .section > div > ul,
 main > .section > div > ol {
-  padding-left: 1.25rem;
+  padding-left: 1.5rem;
   max-width: var(--prose-width);
+  margin: 1rem 0 1.5rem;
 }
 
 main > .section > div > ul > li,
 main > .section > div > ol > li {
-  margin-bottom: 0.5rem;
-  line-height: 1.7;
+  margin-bottom: 0.6rem;
+  line-height: 1.85;
+  font-size: clamp(1rem, 1.3vw, 1.0625rem);
 }
 
-main > .section > div > ul > li::marker {
+main > .section > div > ul > li::marker,
+main > .section > div > ol > li::marker {
   color: var(--brand-primary);
 }
 
 /* Standalone CTA links rendered inside their own <p> — give the button
    container more breathing room above to detach it from the prose. */
 main > .section > div > .button-container {
-  margin: 1.75rem 0 0.5rem;
+  margin: 2.25rem 0 0.5rem;
+  max-width: none;
+}
+
+/* Smooth scroll anchoring — keep section heads clear of the sticky header. */
+main > .section[id],
+main > .section [id] {
+  scroll-margin-top: calc(var(--header-height) + 1.25rem);
 }
 
 /* Generic table fallback — also covers any plain table that isn't a
@@ -200,6 +282,7 @@ img, picture {
   display: block;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 code, pre, samp {
   font-family: var(--fixed-font-family);
   font-size: var(--body-font-size-s);
@@ -279,6 +362,13 @@ main > .section.highlight {
   background-color: var(--bg-alt);
 }
 
+/* Default zebra rhythm — every other id-bearing section gets the soft
+   alt background so the page reads as distinct chapters. The hero
+   (full-bleed) is exempt because it has its own treatment. */
+main > .section[id]:nth-of-type(even):not(.full-bleed, .dark) {
+  background-color: var(--bg-alt);
+}
+
 /* prose / breath section — single centered column */
 main > .section.breath > div {
   max-width: 38rem;
@@ -292,6 +382,7 @@ main > .section.breath h2 {
   font-weight: 800;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 main > .section.breath p {
   font-size: 1.125rem;
   line-height: 1.85;
@@ -304,9 +395,10 @@ button {
   display: inline-block;
   font-family: var(--body-font-family);
   font-weight: 600;
-  font-size: var(--body-font-size-m);
+  font-size: 1.05rem;
   line-height: 1;
-  padding: 0.875rem 1.75rem;
+  letter-spacing: 0.02em;
+  padding: 1rem 2rem;
   border-radius: 999px;
   border: 2px solid var(--brand-primary);
   background-color: var(--brand-primary);
@@ -315,6 +407,10 @@ button {
   text-align: center;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+a.button:hover {
+  transform: translateY(-1px);
 }
 
 a.button:hover,

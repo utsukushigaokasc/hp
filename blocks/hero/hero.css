@@ -42,7 +42,8 @@ main .hero::after {
   background: linear-gradient(
     180deg,
     rgb(11 29 89 / 55%) 0%,
-    rgb(9 23 69 / 92%) 100%
+    rgb(9 23 69 / 75%) 55%,
+    rgb(9 23 69 / 95%) 100%
   );
   pointer-events: none;
 }
@@ -50,32 +51,43 @@ main .hero::after {
 main .hero .hero-content {
   position: relative;
   z-index: 2;
-  max-width: 60rem;
+  max-width: 64rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  gap: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 main .hero .hero-title {
-  font-size: clamp(3rem, 9vw, 7.5rem);
+  font-size: clamp(3.25rem, 10vw, 8rem);
   font-weight: 800;
   line-height: 1.02;
   margin: 0;
   color: #fff;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  text-shadow: 0 2px 30px rgb(9 23 69 / 35%);
+  font-feature-settings: "palt" 1;
 }
 
 main .hero .hero-subtitle {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-size: clamp(1.0625rem, 1.7vw, 1.375rem);
   margin: 0;
-  color: rgb(255 255 255 / 90%);
+  color: rgb(255 255 255 / 92%);
   font-weight: 400;
   max-width: 40rem;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  font-feature-settings: "palt" 1;
 }
 
 main .hero .hero-cta {
-  margin: 0.5rem 0 0;
+  margin: 1rem 0 0;
+  max-width: none;
+}
+
+main .hero .hero-cta a.button {
+  padding: 1.1rem 2.5rem;
+  font-size: 1.125rem;
 }
 
 /* scroll cue */
