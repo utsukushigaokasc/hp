@@ -8,10 +8,10 @@ footer .footer {
   position: relative;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 6rem var(--gutter) 2rem;
+  padding: clamp(3rem, 6vw, 5rem) var(--gutter) 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
 footer .footer-inner {

@@ -20,9 +20,11 @@
   --max-width: 1200px;
   --header-height: 72px;
   --content-padding-x: 1.25rem;
-  --section-pad-y: clamp(6rem, 12vh, 10rem);
+  --section-pad-y: clamp(3.5rem, 7vh, 6rem);
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --prose-width: 66ch;
+  --content-stack: clamp(1rem, 2.4vw, 1.75rem);
+  --heading-stack: clamp(2.25rem, 5vw, 3.5rem);
 
   /* fonts */
   --body-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
@@ -87,8 +89,8 @@ main {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--heading-font-family);
   font-weight: 700;
-  line-height: 1.15;
-  margin: 0 0 0.6em;
+  line-height: 1.2;
+  margin: 0 0 0.75em;
   color: var(--text-color);
   letter-spacing: -0.01em;
 }
@@ -106,11 +108,80 @@ h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--body-font-size-m); }
 
 p, ul, ol, dl, blockquote, pre {
-  margin: 0 0 1em;
+  margin: 0 0 1.15em;
 }
 
 main p {
   max-width: var(--prose-width);
+}
+
+/* Heading rhythm — h2/h3 need breathing room from preceding content,
+   not just below them. The :first-child reset prevents stray top space at
+   the very top of a section. */
+main > .section > div > h2,
+main > .section > div > h3 {
+  margin-top: var(--heading-stack);
+}
+
+main > .section > div > h2:first-child,
+main > .section > div > h3:first-child {
+  margin-top: 0;
+}
+
+/* Slightly more breathing room between adjacent prose paragraphs,
+   especially helpful for News and FAQ sections where each entry is one
+   paragraph and we want each entry to feel like its own card. */
+main > .section > div > p + p {
+  margin-top: var(--content-stack);
+}
+
+/* Lists in prose — give items breathing room and a clean indent */
+main > .section > div > ul,
+main > .section > div > ol {
+  padding-left: 1.25rem;
+  max-width: var(--prose-width);
+}
+
+main > .section > div > ul > li,
+main > .section > div > ol > li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+main > .section > div > ul > li::marker {
+  color: var(--brand-primary);
+}
+
+/* Standalone CTA links rendered inside their own <p> — give the button
+   container more breathing room above to detach it from the prose. */
+main > .section > div > .button-container {
+  margin: 1.75rem 0 0.5rem;
+}
+
+/* Generic table fallback — also covers any plain table that isn't a
+   dedicated block. */
+main > .section table {
+  width: 100%;
+  max-width: var(--prose-width);
+  border-collapse: collapse;
+  margin: 1.5rem 0 2rem;
+}
+
+main > .section table th,
+main > .section table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  vertical-align: top;
+}
+
+main > .section table th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--brand-primary);
 }
 
 a:any-link {
@@ -183,6 +254,7 @@ main > .section.dark {
   --text-muted: rgb(255 255 255 / 75%);
 }
 
+/* stylelint-disable no-descending-specificity */
 main > .section.dark h1,
 main > .section.dark h2,
 main > .section.dark h3,
@@ -191,6 +263,7 @@ main > .section.dark h5,
 main > .section.dark h6 {
   color: #fff;
 }
+/* stylelint-enable no-descending-specificity */
 
 main > .section.dark a:any-link {
   color: var(--brand-accent);
@@ -212,6 +285,7 @@ main > .section.breath > div {
   text-align: center;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 main > .section.breath h2 {
   font-size: clamp(2.5rem, 6vw, 5rem);
   letter-spacing: -0.02em;
@@ -303,6 +377,7 @@ button:disabled:hover {
   cursor: not-allowed;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 .button-container {
   margin: 1rem 0;
 }
