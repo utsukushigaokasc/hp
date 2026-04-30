@@ -1,13 +1,33 @@
 /* Carousel block — adapted from Adobe AEM Block Collection (commit f7892f5) */
 
+/* The section that contains this carousel must break out of the page's
+   max-width + section padding so the carousel can be full-bleed and
+   exactly viewport-height. */
+main > .section.carousel-container {
+  padding: 0;
+  margin: 0;
+}
+
+main > .section.carousel-container > div {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .carousel {
-  scroll-margin-top: var(--header-height, 72px);
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
   background-color: var(--brand-primary, #0b1d59);
   color: #fff;
+  scroll-margin-top: var(--header-height, 72px);
 }
 
 .carousel .carousel-slides-container {
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .carousel .carousel-slides,
@@ -19,9 +39,11 @@
 
 .carousel .carousel-slides {
   display: flex;
+  width: 100%;
+  height: 100%;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  overflow: scroll clip;
+  overflow: auto hidden;
 }
 
 .carousel .carousel-slides::-webkit-scrollbar {
@@ -30,140 +52,156 @@
 
 .carousel .carousel-slide {
   flex: 0 0 100%;
-  scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
   position: relative;
   width: 100%;
-  min-height: 100svh;
+  height: 100%;
+  scroll-snap-align: start;
   background-color: var(--brand-primary, #0b1d59);
   color: #fff;
+  overflow: hidden;
 }
 
-.carousel .carousel-slide:has(.carousel-slide-content[data-align='center']) {
-  align-items: center;
-}
-
-.carousel .carousel-slide:has(.carousel-slide-content[data-align='right']) {
-  align-items: flex-end;
-}
-
-.carousel .carousel-slide .carousel-slide-image picture {
+/* Image layer — fills the entire slide regardless of source aspect ratio. */
+.carousel .carousel-slide-image {
   position: absolute;
   inset: 0;
+  z-index: 0;
+  overflow: hidden;
 }
 
-.carousel .carousel-slide .carousel-slide-image picture > img {
-  height: 100%;
+.carousel .carousel-slide-image picture {
+  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
+}
+
+.carousel .carousel-slide-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
 }
 
-/* Navy gradient overlay for legibility */
-.carousel .carousel-slide .carousel-slide-image::after {
+/* Gradient overlay for legibility — sits on top of image, below content. */
+.carousel .carousel-slide-image::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(11 29 89 / 45%) 0%, rgb(9 23 69 / 85%) 100%);
+  background:
+    linear-gradient(180deg, rgb(11 29 89 / 25%) 0%, rgb(9 23 69 / 80%) 100%);
   pointer-events: none;
-  z-index: 0;
-}
-
-.carousel .carousel-slide .carousel-slide-content {
   z-index: 1;
-  margin: clamp(1.5rem, 6vw, 4rem);
-  padding: clamp(1rem, 2.5vw, 1.75rem) 0;
-  color: #fff;
-  background-color: transparent;
-  position: relative;
-  width: var(--slide-content-width, auto);
-  max-width: min(90%, 56rem);
 }
 
-.carousel .carousel-slide .carousel-slide-content h1,
-.carousel .carousel-slide .carousel-slide-content h2,
-.carousel .carousel-slide .carousel-slide-content h3 {
-  font-size: clamp(2.5rem, 7vw, 5.5rem);
+/* Content layer — overlay on top of image, does NOT push slide height. */
+.carousel .carousel-slide-content {
+  position: absolute;
+  left: clamp(1.5rem, 6vw, 4rem);
+  right: clamp(1.5rem, 6vw, 4rem);
+  bottom: clamp(3rem, 9vh, 6rem);
+  z-index: 2;
+  max-width: 56rem;
+  color: #fff;
+}
+
+.carousel
+  .carousel-slide:has(.carousel-slide-content[data-align='center'])
+  .carousel-slide-content {
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 6vw, 4rem);
+  text-align: center;
+}
+
+.carousel
+  .carousel-slide:has(.carousel-slide-content[data-align='right'])
+  .carousel-slide-content {
+  left: auto;
+  text-align: right;
+}
+
+.carousel .carousel-slide-content h1,
+.carousel .carousel-slide-content h2,
+.carousel .carousel-slide-content h3 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 4.5rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.05;
-  margin: 0 0 1rem;
   color: #fff;
 }
 
-.carousel .carousel-slide .carousel-slide-content p {
+.carousel .carousel-slide-content p {
+  margin: 0 0 1.5rem;
+  max-width: 38rem;
   font-size: clamp(1rem, 1.4vw, 1.25rem);
   line-height: 1.6;
-  margin: 0 0 1.25rem;
   color: rgb(255 255 255 / 92%);
 }
 
-/* CTA pill — overrides default link styling for any link in slide content */
-.carousel .carousel-slide .carousel-slide-content a,
-.carousel .carousel-slide .carousel-slide-content .button {
+/* CTA pill */
+.carousel .carousel-slide-content a,
+.carousel .carousel-slide-content .button {
   display: inline-block;
   padding: 1rem 2rem;
-  font-size: 1.05rem;
-  font-weight: 600;
+  border: 0;
   border-radius: 999px;
   background-color: var(--brand-accent, #f6c845);
   color: var(--brand-primary, #0b1d59);
+  font-size: 1.05rem;
+  font-weight: 600;
   text-decoration: none;
-  border: 0;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.carousel .carousel-slide .carousel-slide-content a:hover,
-.carousel .carousel-slide .carousel-slide-content a:focus-visible,
-.carousel .carousel-slide .carousel-slide-content .button:hover,
-.carousel .carousel-slide .carousel-slide-content .button:focus-visible {
+.carousel .carousel-slide-content a:hover,
+.carousel .carousel-slide-content a:focus-visible,
+.carousel .carousel-slide-content .button:hover,
+.carousel .carousel-slide-content .button:focus-visible {
   background-color: var(--brand-accent-bright, #ffd86b);
   transform: translateY(-2px);
 }
 
-/* Slide indicators — overlaid bottom-center on the slide */
+/* Indicators — overlaid bottom-center. */
 .carousel .carousel-slide-indicators {
+  position: absolute;
+  bottom: clamp(1rem, 3vh, 2rem);
+  left: 0;
+  right: 0;
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px 12px;
   padding: 12px;
-  background-color: transparent;
-  line-height: 0;
-  position: absolute;
-  bottom: clamp(1rem, 3vh, 2rem);
-  left: 0;
-  right: 0;
-  z-index: 2;
 }
 
 .carousel nav[aria-label]:has(> .carousel-slide-indicators) {
   position: static;
 }
 
-.carousel .carousel-slide-indicator button {
-  width: 12px;
-  height: 12px;
-  margin: 0;
-  padding: 0;
-  border-radius: 50%;
-  background-color: rgb(255 255 255 / 50%);
-  border: 0;
-  transition: background-color 0.2s, transform 0.2s;
-  cursor: pointer;
-  box-shadow: 0 0 0 16px transparent;
-}
-
 .carousel .carousel-slide-indicator {
-  /* tap target wrapper */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+}
+
+.carousel .carousel-slide-indicator button {
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 50%);
+  cursor: pointer;
+  transition: background-color 0.2s ease, width 0.2s ease, transform 0.2s ease;
 }
 
 .carousel .carousel-slide-indicator button:hover,
@@ -173,99 +211,78 @@
 
 .carousel .carousel-slide-indicator button:disabled,
 .carousel .carousel-slide-indicator button[aria-current='true'] {
+  width: 24px;
+  border-radius: 999px;
   background-color: var(--brand-accent, #f6c845);
-  transform: scale(1.2);
 }
 
+/* Prev/next buttons */
 .carousel .carousel-navigation-buttons {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  left: 12px;
-  right: 12px;
+  left: clamp(0.5rem, 1.5vw, 1.5rem);
+  right: clamp(0.5rem, 1.5vw, 1.5rem);
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 2;
   pointer-events: none;
+  transform: translateY(-50%);
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
 .carousel .carousel-navigation-buttons button {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   margin: 0;
-  border-radius: 50%;
   padding: 0;
-  background-color: rgb(11 29 89 / 35%);
   border: 1px solid rgb(255 255 255 / 30%);
-  transition: background-color 0.2s;
+  border-radius: 50%;
+  background-color: rgb(11 29 89 / 35%);
   pointer-events: auto;
   cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .carousel .carousel-navigation-buttons button:hover,
 .carousel .carousel-navigation-buttons button:focus-visible {
   background-color: var(--brand-primary, #0b1d59);
+  border-color: rgb(255 255 255 / 60%);
 }
 
 .carousel .carousel-navigation-buttons button::after {
-  display: block;
   content: '';
-  border: 2px solid #fff;
-  border-bottom: 0;
-  border-left: 0;
-  height: 12px;
-  width: 12px;
   position: absolute;
   top: 50%;
   left: calc(50% + 2px);
+  display: block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-bottom: 0;
+  border-left: 0;
   transform: translate(-50%, -50%) rotate(-135deg);
 }
 
 .carousel .carousel-navigation-buttons button.slide-next::after {
-  transform: translate(-50%, -50%) rotate(45deg);
   left: calc(50% - 2px);
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
-/* Pause smooth scroll for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .carousel .carousel-slides {
     scroll-behavior: auto;
   }
 }
 
-@media (width >= 600px) {
-  .carousel .carousel-navigation-buttons {
-    left: 24px;
-    right: 24px;
-  }
-
-  .carousel .carousel-slide .carousel-slide-content {
-    --slide-content-width: min(56rem, calc((100% - 184px)));
-
-    margin: clamp(2rem, 8vw, 6rem);
-  }
-
-  .carousel .carousel-slide .carousel-slide-content[data-align='justify'] {
-    --slide-content-width: auto;
-  }
-}
-
 @media (width < 600px) {
-  .carousel .carousel-slide {
-    min-height: 100svh;
+  .carousel .carousel-slide-content {
+    bottom: clamp(2rem, 7vh, 4rem);
   }
 
-  .carousel .carousel-slide .carousel-slide-content {
-    margin: 1.25rem;
-    padding: 1rem 0;
-    max-width: calc(100% - 2.5rem);
-  }
-
-  .carousel .carousel-navigation-buttons {
-    left: 8px;
-    right: 8px;
+  .carousel .carousel-navigation-buttons button {
+    width: 40px;
+    height: 40px;
   }
 }
