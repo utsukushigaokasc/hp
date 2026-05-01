@@ -99,9 +99,11 @@ main .schedule .schedule-table td:first-child {
     vertical-align: middle;
   }
 
+  /* First column gets padding-left so the 3px hover accent bar
+     (box-shadow inset) sits in the gutter and never overlaps text. */
   main .schedule .schedule-table th:first-child,
   main .schedule .schedule-table td:first-child {
-    padding-left: 0;
+    padding-left: 0.875rem;
   }
 
   main .schedule .schedule-table th:last-child,

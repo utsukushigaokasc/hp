@@ -56,6 +56,75 @@
   box-shadow: 0 6px 18px rgb(11 29 89 / 22%);
 }
 
+.schedule-grid .sg-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  margin: 0 0 1.25rem;
+}
+
+.schedule-grid .sg-month-prev,
+.schedule-grid .sg-month-next {
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgb(11 29 89 / 18%);
+  background: #fff;
+  color: var(--brand-primary, #0b1d59);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease, opacity 180ms ease;
+}
+
+.schedule-grid .sg-month-prev:disabled,
+.schedule-grid .sg-month-next:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.schedule-grid .sg-month-prev:hover:not(:disabled),
+.schedule-grid .sg-month-next:hover:not(:disabled) {
+  border-color: var(--brand-primary, #0b1d59);
+  transform: translateY(-1px);
+}
+
+.schedule-grid .sg-month-prev::after,
+.schedule-grid .sg-month-next::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentcolor;
+  border-bottom: 0;
+  border-left: 0;
+  transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+.schedule-grid .sg-month-next::after {
+  left: calc(50% - 1px);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.schedule-grid .sg-month-prev::after {
+  left: calc(50% + 1px);
+}
+
+.schedule-grid .sg-month-label {
+  font-size: clamp(1.25rem, 2.4vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--brand-primary, #0b1d59);
+  min-width: 7em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .schedule-grid .sg-list {
   display: flex;
   flex-direction: column;
@@ -64,17 +133,6 @@
 
 .schedule-grid .sg-month {
   margin: 0;
-}
-
-.schedule-grid .sg-month-title {
-  margin: 0 0 0.85rem;
-  padding: 0 0 0.4rem;
-  font-size: clamp(1.25rem, 2.4vw, 1.5rem);
-  font-weight: 800;
-  color: var(--brand-primary, #0b1d59);
-  letter-spacing: -0.01em;
-  border-bottom: 3px solid var(--brand-accent, #f6c845);
-  display: inline-block;
 }
 
 .schedule-grid .sg-events {

@@ -42,6 +42,10 @@ function ymdToTs(date, time) {
   return new Date(`${date}T${t}:00+09:00`).getTime();
 }
 
+function ymKey(date) {
+  return date.slice(0, 7);
+}
+
 async function fetchSchedule() {
   const res = await fetch(SCHEDULE_URL, { cache: 'no-cache' });
   if (!res.ok) throw new Error(`schedule fetch failed: ${res.status}`);
@@ -101,44 +105,80 @@ function eventEl(ev) {
 function groupByMonth(events) {
   const groups = new Map();
   events.forEach((ev) => {
-    const ym = ev.date.slice(0, 7);
+    const ym = ymKey(ev.date);
     if (!groups.has(ym)) groups.set(ym, []);
     groups.get(ym).push(ev);
   });
   return groups;
 }
 
-function applyFilter(block, slug) {
+function getAllYms(block) {
+  return [...block.querySelectorAll('.sg-month')]
+    .map((m) => m.dataset.ym)
+    .sort();
+}
+
+function render(block) {
+  const cat = block.dataset.activeCat || 'all';
+  const ym = block.dataset.activeYm;
+
   block.querySelectorAll('.sg-tab').forEach((t) => {
-    const active = t.dataset.cat === slug;
+    const active = t.dataset.cat === cat;
     t.setAttribute('aria-selected', active ? 'true' : 'false');
     t.classList.toggle('is-active', active);
   });
-  block.querySelectorAll('.sg-event').forEach((el) => {
-    const cat = el.dataset.category;
-    const match = slug === 'all' || cat === slug || cat === 'all';
-    el.hidden = !match;
-  });
+
   block.querySelectorAll('.sg-month').forEach((m) => {
-    const visible = [...m.querySelectorAll('.sg-event')].some((e) => !e.hidden);
-    m.hidden = !visible;
+    m.hidden = m.dataset.ym !== ym;
   });
-  const list = block.querySelector('.sg-list');
-  if (list) {
-    const anyVisible = !!block.querySelector('.sg-event:not([hidden])');
-    let empty = block.querySelector('.sg-empty');
-    if (!anyVisible) {
+
+  const visibleMonth = block.querySelector(`.sg-month[data-ym="${ym}"]`);
+  let visibleEventCount = 0;
+  if (visibleMonth) {
+    visibleMonth.querySelectorAll('.sg-event').forEach((el) => {
+      const evCat = el.dataset.category;
+      const match = cat === 'all' || evCat === cat || evCat === 'all';
+      el.hidden = !match;
+      if (match) visibleEventCount += 1;
+    });
+    let empty = visibleMonth.querySelector('.sg-empty');
+    if (!visibleEventCount) {
       if (!empty) {
         empty = document.createElement('p');
         empty.className = 'sg-empty';
-        empty.textContent = 'この期間に該当する予定はありません。';
-        list.append(empty);
+        empty.textContent = 'この月に該当する予定はありません。';
+        visibleMonth.append(empty);
       }
       empty.hidden = false;
     } else if (empty) {
       empty.hidden = true;
     }
   }
+
+  const yms = getAllYms(block);
+  const idx = yms.indexOf(ym);
+  block.querySelector('.sg-month-prev').disabled = idx <= 0;
+  block.querySelector('.sg-month-next').disabled = idx < 0 || idx >= yms.length - 1;
+
+  const [y, m] = ym.split('-').map(Number);
+  block.querySelector('.sg-month-label').textContent = `${y}年${m}月`;
+}
+
+function setMonth(block, ym) {
+  block.dataset.activeYm = ym;
+  render(block);
+}
+
+function setCategory(block, cat) {
+  block.dataset.activeCat = cat;
+  render(block);
+}
+
+function chooseInitialYm(yms) {
+  const now = new Date();
+  const todayYm = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}`;
+  if (yms.includes(todayYm)) return todayYm;
+  return yms.find((ym) => ym >= todayYm) || yms[yms.length - 1];
 }
 
 const TABS = [
@@ -148,10 +188,7 @@ const TABS = [
   { slug: 'u12', label: 'U12（5・6年）' },
 ];
 
-export default async function decorate(block) {
-  block.textContent = '';
-  block.classList.add('schedule-grid');
-
+function buildTabs(block) {
   const tabs = document.createElement('div');
   tabs.className = 'sg-tabs';
   tabs.setAttribute('role', 'tablist');
@@ -163,10 +200,39 @@ export default async function decorate(block) {
     btn.setAttribute('role', 'tab');
     btn.setAttribute('aria-selected', t.slug === 'all' ? 'true' : 'false');
     btn.textContent = t.label;
-    btn.addEventListener('click', () => applyFilter(block, t.slug));
+    btn.addEventListener('click', () => setCategory(block, t.slug));
     tabs.append(btn);
   });
-  block.append(tabs);
+  return tabs;
+}
+
+function buildMonthNav(block) {
+  const nav = document.createElement('div');
+  nav.className = 'sg-month-nav';
+  nav.innerHTML = `
+    <button type="button" class="sg-month-prev" aria-label="前の月"></button>
+    <span class="sg-month-label" aria-live="polite"></span>
+    <button type="button" class="sg-month-next" aria-label="翌月"></button>
+  `;
+  nav.querySelector('.sg-month-prev').addEventListener('click', () => {
+    const yms = getAllYms(block);
+    const idx = yms.indexOf(block.dataset.activeYm);
+    if (idx > 0) setMonth(block, yms[idx - 1]);
+  });
+  nav.querySelector('.sg-month-next').addEventListener('click', () => {
+    const yms = getAllYms(block);
+    const idx = yms.indexOf(block.dataset.activeYm);
+    if (idx >= 0 && idx < yms.length - 1) setMonth(block, yms[idx + 1]);
+  });
+  return nav;
+}
+
+export default async function decorate(block) {
+  block.textContent = '';
+  block.classList.add('schedule-grid');
+
+  block.append(buildTabs(block));
+  block.append(buildMonthNav(block));
 
   const list = document.createElement('div');
   list.className = 'sg-list';
@@ -181,24 +247,17 @@ export default async function decorate(block) {
     return;
   }
 
-  const todayMs = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00+09:00`).getTime();
-  const upcoming = events.filter((ev) => ev.ts >= todayMs);
-
-  if (!upcoming.length) {
+  if (!events.length) {
     list.innerHTML = '<p class="sg-empty">予定の登録はまだありません。</p>';
     return;
   }
 
-  const groups = groupByMonth(upcoming);
-  const ymKeys = [...groups.keys()].sort();
-  ymKeys.forEach((ym) => {
+  const groups = groupByMonth(events);
+  const yms = [...groups.keys()].sort();
+  yms.forEach((ym) => {
     const section = document.createElement('section');
     section.className = 'sg-month';
-    const [y, m] = ym.split('-').map(Number);
-    const title = document.createElement('h3');
-    title.className = 'sg-month-title';
-    title.textContent = `${y}年${m}月`;
-    section.append(title);
+    section.dataset.ym = ym;
     const ul = document.createElement('ul');
     ul.className = 'sg-events';
     groups.get(ym).forEach((ev) => ul.append(eventEl(ev)));
@@ -206,5 +265,6 @@ export default async function decorate(block) {
     list.append(section);
   });
 
-  applyFilter(block, 'all');
+  block.dataset.activeCat = 'all';
+  setMonth(block, chooseInitialYm(yms));
 }
