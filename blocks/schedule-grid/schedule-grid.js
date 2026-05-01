@@ -89,7 +89,7 @@ function eventEl(ev) {
     <div class="sg-event-body">
       <div class="sg-event-meta">
         <span class="sg-event-time">${time}</span>
-        ${ev.category ? `<span class="sg-event-category sg-cat-${slug}">${ev.category}</span>` : ''}
+        ${ev.category ? `<span class="sg-event-category">${ev.category}</span>` : ''}
       </div>
       <h3 class="sg-event-title">${ev.title}</h3>
       ${ev.location ? `<p class="sg-event-location">${ev.location}</p>` : ''}
