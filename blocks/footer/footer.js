@@ -55,6 +55,16 @@ export default async function decorate(block) {
   inner.className = 'footer-inner';
   while (fragment.firstElementChild) inner.append(fragment.firstElementChild);
 
+  // The shared decorateMain() pass tags every <p>/<h*> with data-reveal,
+  // which leaves them at opacity:0 until the global IntersectionObserver
+  // marks them .is-in. That observer was set up before this fragment
+  // existed, so the footer would otherwise stay invisible. Strip the
+  // attribute here — the footer doesn't need a reveal animation anyway.
+  inner.querySelectorAll('[data-reveal]').forEach((el) => {
+    el.removeAttribute('data-reveal');
+    el.style.removeProperty('--i');
+  });
+
   // Merge logo into the brand line. The first <p> normally holds the
   // brand label (<strong>美しが丘SC</strong>); slot the crest in front of
   // it so the two read as one mark instead of two stacked elements.
