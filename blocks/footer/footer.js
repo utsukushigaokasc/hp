@@ -3,6 +3,20 @@ import { loadFragment } from '../fragment/fragment.js';
 
 const FALLBACK_TEXT = '© 2026 美しが丘SC';
 
+function buildLogo() {
+  const wrap = document.createElement('div');
+  wrap.className = 'footer-logo';
+  const img = document.createElement('img');
+  img.src = '/icons/logo.png';
+  img.alt = '美しが丘SC';
+  img.width = 72;
+  img.height = 72;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  wrap.append(img);
+  return wrap;
+}
+
 function buildWordmark() {
   const mark = document.createElement('div');
   mark.className = 'footer-wordmark';
@@ -17,6 +31,7 @@ function renderFallback(block) {
   wrapper.className = 'footer-fallback';
   wrapper.textContent = FALLBACK_TEXT;
   block.append(wrapper);
+  block.prepend(buildLogo());
   block.append(buildWordmark());
 }
 
@@ -47,5 +62,6 @@ export default async function decorate(block) {
   inner.className = 'footer-inner';
   while (fragment.firstElementChild) inner.append(fragment.firstElementChild);
   block.append(inner);
+  block.prepend(buildLogo());
   block.append(buildWordmark());
 }

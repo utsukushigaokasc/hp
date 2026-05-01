@@ -4,14 +4,29 @@ const isDesktop = window.matchMedia('(min-width: 1024px)');
 
 const BRAND_FALLBACK = '美しが丘SC';
 
-function makeBrandEl(text) {
-  const brand = document.createElement('div');
-  brand.className = 'nav-brand';
+function buildBrandLink(text) {
   const link = document.createElement('a');
   link.href = '/';
   link.setAttribute('aria-label', `${text} home`);
-  link.textContent = text;
-  brand.append(link);
+  const img = document.createElement('img');
+  img.src = '/icons/logo.png';
+  img.alt = '';
+  img.width = 40;
+  img.height = 40;
+  img.loading = 'eager';
+  img.decoding = 'async';
+  img.className = 'nav-brand-logo';
+  const label = document.createElement('span');
+  label.className = 'nav-brand-text';
+  label.textContent = text;
+  link.append(img, label);
+  return link;
+}
+
+function makeBrandEl(text) {
+  const brand = document.createElement('div');
+  brand.className = 'nav-brand';
+  brand.append(buildBrandLink(text));
   return brand;
 }
 
@@ -136,11 +151,7 @@ export default async function decorate(block) {
   if (brandSection && !brandSection.querySelector('a')) {
     const text = brandSection.textContent.trim() || BRAND_FALLBACK;
     brandSection.replaceChildren();
-    const link = document.createElement('a');
-    link.href = '/';
-    link.setAttribute('aria-label', `${text} home`);
-    link.textContent = text;
-    brandSection.append(link);
+    brandSection.append(buildBrandLink(text));
   }
 
   if (!nav.querySelector('.nav-brand')) {
