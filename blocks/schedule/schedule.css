@@ -111,10 +111,8 @@ main .schedule .schedule-table td:first-child {
 
   /* stylelint-disable-next-line no-descending-specificity */
   main .schedule .schedule-table th {
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
     color: var(--text-muted);
     border-bottom: 2px solid var(--brand-primary);
     background: transparent;
@@ -130,6 +128,14 @@ main .schedule .schedule-table td:first-child {
     font-size: 1.0625rem;
     margin-bottom: 0;
     white-space: nowrap;
+  }
+
+  /* Even rows have a solid td background that paints over the tr's
+     yellow stripe — clear it on hover so the stripe + tint show.
+     Placed last so the override beats the alternating-row bg above. */
+  /* stylelint-disable-next-line no-descending-specificity */
+  main .schedule .schedule-table tbody tr:hover td {
+    background-color: transparent;
   }
 }
 
