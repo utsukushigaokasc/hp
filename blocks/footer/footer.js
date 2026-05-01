@@ -9,30 +9,23 @@ function buildLogo() {
   const img = document.createElement('img');
   img.src = '/icons/logo.png';
   img.alt = '美しが丘SC';
-  img.width = 72;
-  img.height = 72;
+  img.width = 48;
+  img.height = 48;
   img.loading = 'lazy';
   img.decoding = 'async';
   wrap.append(img);
   return wrap;
 }
 
-function buildWordmark() {
-  const mark = document.createElement('div');
-  mark.className = 'footer-wordmark';
-  mark.setAttribute('aria-hidden', 'true');
-  mark.textContent = '美しが丘SC';
-  return mark;
-}
-
 function renderFallback(block) {
   block.textContent = '';
   const wrapper = document.createElement('div');
   wrapper.className = 'footer-fallback';
-  wrapper.textContent = FALLBACK_TEXT;
+  wrapper.append(buildLogo());
+  const text = document.createElement('p');
+  text.textContent = FALLBACK_TEXT;
+  wrapper.append(text);
   block.append(wrapper);
-  block.prepend(buildLogo());
-  block.append(buildWordmark());
 }
 
 /**
@@ -61,7 +54,17 @@ export default async function decorate(block) {
   const inner = document.createElement('div');
   inner.className = 'footer-inner';
   while (fragment.firstElementChild) inner.append(fragment.firstElementChild);
+
+  // Merge logo into the brand line. The first <p> normally holds the
+  // brand label (<strong>美しが丘SC</strong>); slot the crest in front of
+  // it so the two read as one mark instead of two stacked elements.
+  const brandLine = inner.querySelector('p:first-child');
+  if (brandLine) {
+    brandLine.classList.add('footer-brand');
+    brandLine.prepend(buildLogo());
+  } else {
+    inner.prepend(buildLogo());
+  }
+
   block.append(inner);
-  block.prepend(buildLogo());
-  block.append(buildWordmark());
 }
