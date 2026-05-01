@@ -325,29 +325,11 @@ main > .section table th {
 }
 
 main > .section table tbody tr {
-  position: relative;
   transition: background-color 200ms var(--ease-snap);
-}
-
-main > .section table tbody tr::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--brand-accent);
-  transform: scaleY(0);
-  transform-origin: top center;
-  transition: transform 250ms var(--ease-snap);
 }
 
 main > .section table tbody tr:hover {
   background-color: rgb(246 200 69 / 6%);
-}
-
-main > .section table tbody tr:hover::before {
-  transform: scaleY(1);
 }
 
 a:any-link {
