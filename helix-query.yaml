@@ -1,0 +1,19 @@
+version: 1
+indices:
+  news:
+    include:
+      - '/news/**'
+    target: /news/query-index.json
+    properties:
+      title:
+        select: main h1
+        value: |
+          textContent(el)
+      date:
+        select: head > meta[name="date"]
+        value: |
+          attribute(el, 'content')
+      lastModified:
+        select: none
+        value: |
+          parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
