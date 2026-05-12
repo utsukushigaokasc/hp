@@ -2,7 +2,7 @@
 Your project's description...
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.hlx.page/
+- Preview: https://main--hp--utsukushigaokasc.aem.live/
 - Live: https://main--hp--utsukushigaokasc.aem.page/
 
 ## Installation
