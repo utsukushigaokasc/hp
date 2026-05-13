@@ -1,3 +1,7 @@
+.news {
+  min-height: 12rem;
+}
+
 .news .news-list {
   list-style: none;
   padding: 0;
