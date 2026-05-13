@@ -10,39 +10,23 @@ function parseLimit(block) {
   return Number.isFinite(n) && n > 0 ? n : 5;
 }
 
-async function getNewsPaths() {
-  const resp = await fetch('/sitemap.xml');
-  if (!resp.ok) return [];
-  const text = await resp.text();
-  const doc = new DOMParser().parseFromString(text, 'text/xml');
-  return [...doc.querySelectorAll('loc')]
-    .map((el) => new URL(el.textContent).pathname)
-    .filter((p) => /^\/news\/\d{4}\//.test(p));
-}
-
-async function getArticleMeta(path) {
-  try {
-    const resp = await fetch(path);
-    if (!resp.ok) return null;
-    const html = await resp.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const title = doc.querySelector('head > title')?.textContent?.trim() || path;
-    const date = doc.querySelector('head > meta[name="date"]')?.getAttribute('content') || '';
-    return { path, title, date };
-  } catch (e) {
-    return null;
-  }
-}
-
 export default async function decorate(block) {
   const limit = parseLimit(block);
   block.textContent = '';
 
-  const paths = await getNewsPaths();
-  const items = (await Promise.all(paths.map(getArticleMeta)))
-    .filter((i) => i && i.date)
-    .sort((a, b) => String(b.date).localeCompare(String(a.date)))
-    .slice(0, limit);
+  let items = [];
+  try {
+    const resp = await fetch('/news/query-index.json');
+    if (resp.ok) {
+      const json = await resp.json();
+      items = (json.data || []).filter((i) => i.date);
+    }
+  } catch (e) {
+    // network/parse error — fall through to empty state
+  }
+
+  items.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  items = items.slice(0, limit);
 
   if (items.length === 0) {
     const empty = document.createElement('p');
@@ -63,7 +47,7 @@ export default async function decorate(block) {
 
     const link = document.createElement('a');
     link.href = item.path;
-    link.textContent = item.title;
+    link.textContent = item.title || item.path;
 
     li.append(time, link);
     ul.append(li);
