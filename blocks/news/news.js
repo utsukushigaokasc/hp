@@ -15,19 +15,19 @@ export default async function decorate(block) {
   const limit = parseLimit(block);
   block.textContent = '';
 
-  let items = [];
+  let allItems = [];
   try {
     const resp = await fetch('/news/query-index.json');
     if (resp.ok) {
       const json = await resp.json();
-      items = (json.data || []).filter((i) => i.date);
+      allItems = (json.data || []).filter((i) => i.date);
     }
   } catch (e) {
     // network/parse error — render empty state
   }
 
-  items.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  if (Number.isFinite(limit)) items = items.slice(0, limit);
+  allItems.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const items = Number.isFinite(limit) ? allItems.slice(0, limit) : allItems;
 
   if (items.length === 0) {
     const empty = document.createElement('p');
@@ -54,4 +54,14 @@ export default async function decorate(block) {
     ul.append(li);
   });
   block.append(ul);
+
+  if (allItems.length > items.length) {
+    const more = document.createElement('p');
+    more.className = 'news-more';
+    const moreLink = document.createElement('a');
+    moreLink.href = '/news/';
+    moreLink.textContent = 'すべて見る →';
+    more.append(moreLink);
+    block.append(more);
+  }
 }

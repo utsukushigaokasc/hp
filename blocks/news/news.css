@@ -39,6 +39,21 @@
   color: #888;
 }
 
+.news .news-more {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.news .news-more a {
+  font-size: 0.9375rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.news .news-more a:hover {
+  text-decoration: underline;
+}
+
 @media (min-width: 600px) {
   .news .news-list li {
     flex-direction: row;
