@@ -1,7 +1,7 @@
 version: 1
+auto-generated: true
 indices:
   news:
-    auto-generated: true
     include:
       - '/news/**'
     target: /news/query-index.json
