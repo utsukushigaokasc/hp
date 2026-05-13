@@ -5,7 +5,8 @@ function formatDate(s) {
 }
 
 function parseLimit(block) {
-  const raw = block.textContent.trim();
+  const raw = block.textContent.trim().toLowerCase();
+  if (raw === 'all' || raw === '0') return Infinity;
   const n = parseInt(raw, 10);
   return Number.isFinite(n) && n > 0 ? n : 5;
 }
@@ -26,7 +27,7 @@ export default async function decorate(block) {
   }
 
   items.sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  items = items.slice(0, limit);
+  if (Number.isFinite(limit)) items = items.slice(0, limit);
 
   if (items.length === 0) {
     const empty = document.createElement('p');
