@@ -183,9 +183,9 @@ function chooseInitialYm(yms) {
 
 const TABS = [
   { slug: 'all', label: 'すべて' },
-  { slug: 'u8', label: 'U8（年長〜2年）' },
-  { slug: 'u10', label: 'U10（3・4年）' },
-  { slug: 'u12', label: 'U12（5・6年）' },
+  { slug: 'u8', label: 'U8/U9（年長〜3年）' },
+  { slug: 'u10', label: 'U10/U11（4・5年）' },
+  { slug: 'u12', label: 'U12（6年）' },
 ];
 
 function buildTabs(block) {
